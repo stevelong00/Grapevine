@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Grapevine.Exceptions.Server;
 using Grapevine.Interfaces.Server;
-using Grapevine.Interfaces.Shared;
 using Grapevine.Server;
 using Grapevine.Shared;
-using Grapevine.Shared.Loggers;
 using NSubstitute;
-using NSubstitute.ReturnsExtensions;
 using Shouldly;
 using Xunit;
 
@@ -30,7 +26,6 @@ namespace Grapevine.Tests.Server
                     server.Host.ShouldBe("localhost");
                     server.IsListening.ShouldBeFalse();
                     server.ListenerPrefix.ShouldBe("http://localhost:1234/");
-                    server.Logger.ShouldBeOfType<NullLogger>();
                     server.OnAfterStart.ShouldBeNull();
                     server.OnAfterStop.ShouldBeNull();
                     server.OnBeforeStart.ShouldBeNull();
@@ -131,53 +126,6 @@ namespace Grapevine.Tests.Server
                 using (var server = new RestServer(listener))
                 {
                     server.IsListening.ShouldBeFalse();
-                }
-            }
-        }
-
-        public class LoggerProperty
-        {
-            [Fact]
-            public void NullSetNullLogger()
-            {
-                using (var server = new RestServer())
-                {
-                    server.LogToConsole();
-                    server.Logger.ShouldBeOfType<ConsoleLogger>();
-
-                    server.Logger = null;
-
-                    server.Logger.ShouldBeOfType<NullLogger>();
-                }
-            }
-
-            [Fact]
-            public void SetsRouterLogger()
-            {
-                using (var server = new RestServer())
-                {
-                    server.Router.ShouldNotBeNull();
-                    server.Logger.ShouldBeOfType<NullLogger>();
-                    server.Router.Logger.ShouldBeOfType<NullLogger>();
-
-                    server.LogToConsole();
-
-                    server.Logger.ShouldBeOfType<ConsoleLogger>();
-                    server.Router.Logger.ShouldBeOfType<ConsoleLogger>();
-                }
-            }
-
-            [Fact]
-            public void DoesNotSetRouterLoggerWhenRouterIsNull()
-            {
-                using (var server = new RestServer())
-                {
-                    server.Logger.ShouldBeOfType<NullLogger>();
-                    server.Router = null;
-
-                    Should.NotThrow(() => server.LogToConsole());
-
-                    server.Logger.ShouldBeOfType<ConsoleLogger>();
                 }
             }
         }
@@ -595,155 +543,155 @@ namespace Grapevine.Tests.Server
             [Fact]
             public void ThrowsExceptionWhenRouteNotFound()
             {
-                var logger = new InMemoryLogger();
-                logger.Logs.Count.ShouldBe(0);
+                //var logger = GrapevineLogManager.CreateLogger("");
+                //logger.Logs.Count.ShouldBe(0);
 
-                using (var server = new RestServer(Substitute.For<IHttpListener>()) {Logger = logger})
-                {
-                    server.EnableThrowingExceptions = true;
+                //using (var server = new RestServer(Substitute.For<IHttpListener>()) {Logger = logger})
+                //{
+                //    server.EnableThrowingExceptions = true;
 
-                    var context = Mocks.HttpContext();
-                    context.Server.Returns(server);
+                //    var context = Mocks.HttpContext();
+                //    context.Server.Returns(server);
                     
-                    Should.Throw<RouteNotFoundException>(() => server.TestRouteContext(context));
-                }
+                //    Should.Throw<RouteNotFoundException>(() => server.TestRouteContext(context));
+                //}
 
-                logger.Logs.Count.ShouldBe(1);
-                logger.Logs[0].Exception.GetType().ShouldBe(typeof(RouteNotFoundException));
+                //logger.Logs.Count.ShouldBe(1);
+                //logger.Logs[0].Exception.GetType().ShouldBe(typeof(RouteNotFoundException));
             }
 
             [Fact]
             public void Sends404WhenRouteNotFound()
             {
-                var logger = new InMemoryLogger();
-                logger.Logs.Count.ShouldBe(0);
+                //var logger = new InMemoryLogger();
+                //logger.Logs.Count.ShouldBe(0);
 
-                using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
-                {
-                    var context = Mocks.HttpContext();
-                    context.Server.Returns(server);
+                //using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
+                //{
+                //    var context = Mocks.HttpContext();
+                //    context.Server.Returns(server);
 
-                    server.TestRouteContext(context);
+                //    server.TestRouteContext(context);
 
-                    context.Response.Received().SendResponse(HttpStatusCode.NotFound);
-                }
+                //    context.Response.Received().SendResponse(HttpStatusCode.NotFound);
+                //}
 
-                logger.Logs.Count.ShouldBe(1);
-                logger.Logs[0].Exception.GetType().ShouldBe(typeof(RouteNotFoundException));
+                //logger.Logs.Count.ShouldBe(1);
+                //logger.Logs[0].Exception.GetType().ShouldBe(typeof(RouteNotFoundException));
             }
 
             [Fact]
             public void ThrowsExceptionWhenRouteNotImplemented()
             {
-                var logger = new InMemoryLogger();
-                logger.Logs.Count.ShouldBe(0);
+                //var logger = new InMemoryLogger();
+                //logger.Logs.Count.ShouldBe(0);
 
-                using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
-                {
-                    Func<IHttpContext, IHttpContext> func = ctx =>
-                    {
-                        throw new NotImplementedException();
-                    };
+                //using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
+                //{
+                //    Func<IHttpContext, IHttpContext> func = ctx =>
+                //    {
+                //        throw new NotImplementedException();
+                //    };
 
-                    server.Router.Register(func);
-                    server.EnableThrowingExceptions = true;
+                //    server.Router.Register(func);
+                //    server.EnableThrowingExceptions = true;
 
-                    var context = Mocks.HttpContext();
-                    context.Server.Returns(server);
+                //    var context = Mocks.HttpContext();
+                //    context.Server.Returns(server);
 
-                    Should.Throw<NotImplementedException>(() => server.TestRouteContext(context));
-                }
+                //    Should.Throw<NotImplementedException>(() => server.TestRouteContext(context));
+                //}
 
-                var logs = logger.Logs.FirstOrDefault(l => l.Level == LogLevel.Error);
-                logs.ShouldNotBeNull();
-                logs.Exception.GetType().ShouldBe(typeof(NotImplementedException));
+                //var logs = logger.Logs.FirstOrDefault(l => l.Level == LogLevel.Error);
+                //logs.ShouldNotBeNull();
+                //logs.Exception.GetType().ShouldBe(typeof(NotImplementedException));
             }
 
             [Fact]
             public void Sends501WhenRouteNotImplemented()
             {
-                var logger = new InMemoryLogger();
-                logger.Logs.Count.ShouldBe(0);
+                //var logger = new InMemoryLogger();
+                //logger.Logs.Count.ShouldBe(0);
 
-                using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
-                {
-                    Func<IHttpContext, IHttpContext> func = ctx =>
-                    {
-                        throw new NotImplementedException();
-                    };
+                //using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
+                //{
+                //    Func<IHttpContext, IHttpContext> func = ctx =>
+                //    {
+                //        throw new NotImplementedException();
+                //    };
 
-                    server.Router.Register(func);
+                //    server.Router.Register(func);
 
-                    var context = Mocks.HttpContext();
-                    context.Server.Returns(server);
+                //    var context = Mocks.HttpContext();
+                //    context.Server.Returns(server);
 
-                    server.TestRouteContext(context);
+                //    server.TestRouteContext(context);
 
-                    context.Response.Received().SendResponse(HttpStatusCode.NotImplemented);
-                }
+                //    context.Response.Received().SendResponse(HttpStatusCode.NotImplemented);
+                //}
 
-                var logs = logger.Logs.FirstOrDefault(l => l.Level == LogLevel.Error);
-                logs.ShouldNotBeNull();
-                logs.Exception.GetType().ShouldBe(typeof(NotImplementedException));
+                //var logs = logger.Logs.FirstOrDefault(l => l.Level == LogLevel.Error);
+                //logs.ShouldNotBeNull();
+                //logs.Exception.GetType().ShouldBe(typeof(NotImplementedException));
             }
 
             [Fact]
             public void ThrowsExceptionWhenRouteThrowsException()
             {
-                var logger = new InMemoryLogger();
-                logger.Logs.Count.ShouldBe(0);
+                //var logger = new InMemoryLogger();
+                //logger.Logs.Count.ShouldBe(0);
 
-                var exception = new Exception("Generic excpetion occured");
+                //var exception = new Exception("Generic excpetion occured");
 
-                using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
-                {
-                    Func<IHttpContext, IHttpContext> func = ctx =>
-                    {
-                        throw exception;
-                    };
+                //using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
+                //{
+                //    Func<IHttpContext, IHttpContext> func = ctx =>
+                //    {
+                //        throw exception;
+                //    };
 
-                    server.Router.Register(func);
-                    server.EnableThrowingExceptions = true;
+                //    server.Router.Register(func);
+                //    server.EnableThrowingExceptions = true;
 
-                    var context = Mocks.HttpContext();
-                    context.Server.Returns(server);
+                //    var context = Mocks.HttpContext();
+                //    context.Server.Returns(server);
 
-                    Should.Throw<Exception>(() => server.TestRouteContext(context));
-                }
+                //    Should.Throw<Exception>(() => server.TestRouteContext(context));
+                //}
 
-                var logs = logger.Logs.FirstOrDefault(l => l.Level == LogLevel.Error);
-                logs.ShouldNotBeNull();
-                logs.Exception.ShouldBe(exception);
+                //var logs = logger.Logs.FirstOrDefault(l => l.Level == LogLevel.Error);
+                //logs.ShouldNotBeNull();
+                //logs.Exception.ShouldBe(exception);
             }
 
             [Fact]
             public void Sends500WhenRouteThrowsException()
             {
-                var logger = new InMemoryLogger();
-                logger.Logs.Count.ShouldBe(0);
+                //var logger = new InMemoryLogger();
+                //logger.Logs.Count.ShouldBe(0);
 
-                var exception = new Exception("Generic excpetion occured");
+                //var exception = new Exception("Generic excpetion occured");
 
-                using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
-                {
-                    Func<IHttpContext, IHttpContext> func = ctx =>
-                    {
-                        throw exception;
-                    };
+                //using (var server = new RestServer(Substitute.For<IHttpListener>()) { Logger = logger })
+                //{
+                //    Func<IHttpContext, IHttpContext> func = ctx =>
+                //    {
+                //        throw exception;
+                //    };
 
-                    server.Router.Register(func);
+                //    server.Router.Register(func);
 
-                    var context = Mocks.HttpContext();
-                    context.Server.Returns(server);
+                //    var context = Mocks.HttpContext();
+                //    context.Server.Returns(server);
 
-                    server.TestRouteContext(context);
+                //    server.TestRouteContext(context);
 
-                    context.Response.Received().SendResponse(HttpStatusCode.InternalServerError, exception);
-                }
+                //    context.Response.Received().SendResponse(HttpStatusCode.InternalServerError, exception);
+                //}
 
-                var logs = logger.Logs.FirstOrDefault(l => l.Level == LogLevel.Error);
-                logs.ShouldNotBeNull();
-                logs.Exception.ShouldBe(exception);
+                //var logs = logger.Logs.FirstOrDefault(l => l.Level == LogLevel.Error);
+                //logs.ShouldNotBeNull();
+                //logs.Exception.ShouldBe(exception);
             }
 
             [Fact]
@@ -806,22 +754,22 @@ namespace Grapevine.Tests.Server
             [Fact]
             public void LogsMessageWhenFileReturned()
             {
-                const string filepath = "/some/file/path";
+                //const string filepath = "/some/file/path";
 
-                var context = Mocks.HttpContext();
-                context.WasRespondedTo.Returns(true);
-                context.Request.PathInfo.Returns(filepath);
+                //var context = Mocks.HttpContext();
+                //context.WasRespondedTo.Returns(true);
+                //context.Request.PathInfo.Returns(filepath);
 
-                var logger = new InMemoryLogger();
-                using(var server = new RestServer(Substitute.For<IHttpListener>()){Logger = logger })
-                {
-                    context.Server.Returns(server);
-                    server.TestUnsafeRouteContext(context);
-                }
+                //var logger = new InMemoryLogger();
+                //using(var server = new RestServer(Substitute.For<IHttpListener>()){Logger = logger })
+                //{
+                //    context.Server.Returns(server);
+                //    server.TestUnsafeRouteContext(context);
+                //}
 
-                logger.Logs.Count.ShouldBe(1);
-                logger.Logs[0].Level.ShouldBe(LogLevel.Trace);
-                logger.Logs[0].Message.ShouldBe($"Returned file {filepath}");
+                //logger.Logs.Count.ShouldBe(1);
+                //logger.Logs[0].Level.ShouldBe(LogLevel.Trace);
+                //logger.Logs[0].Message.ShouldBe($"Returned file {filepath}");
             }
 
             [Fact]

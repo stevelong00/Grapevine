@@ -1,6 +1,5 @@
 ﻿using System;
 using Grapevine.Server;
-using Grapevine.Shared.Loggers;
 using Shouldly;
 using Xunit;
 
@@ -14,9 +13,6 @@ namespace Grapevine.Tests.Server
             public void DefaultConfiguration()
             {
                 var options = new ServerSettings();
-
-                options.Logger.ShouldNotBeNull();
-                options.Logger.ShouldBeOfType<NullLogger>();
 
                 options.Router.ShouldNotBeNull();
                 options.Router.ShouldBeOfType<Router>();

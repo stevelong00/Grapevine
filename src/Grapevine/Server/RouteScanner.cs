@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Grapevine.Interfaces.Shared;
+using Grapevine.Logging;
 using Grapevine.Server.Attributes;
-using Grapevine.Shared.Loggers;
 
 namespace Grapevine.Server
 {
@@ -61,7 +61,7 @@ namespace Grapevine.Server
         /// <summary>
         /// Gets or sets the logger
         /// </summary>
-        IGrapevineLogger Logger { get; set; }
+        GrapevineLogger Logger { get; }
 
         /// <summary>
         /// Set a rule to include only RestResources with the specified scope when auto-scanning for routes
@@ -131,7 +131,7 @@ namespace Grapevine.Server
         private readonly List<Assembly> _includedAssemblies;
         private string _scope = string.Empty;
 
-        public IGrapevineLogger Logger { get; set; }
+        public GrapevineLogger Logger { get; }
 
         public static readonly List<Assembly> Assemblies;
 
@@ -148,7 +148,7 @@ namespace Grapevine.Server
 
         internal RouteScanner()
         {
-            Logger = NullLogger.GetInstance();
+            Logger = GrapevineLogManager.CreateLogger<RouteScanner>();
 
             _excludedNamespaces = new List<string>();
             _includedNamespaces = new List<string>();

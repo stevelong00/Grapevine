@@ -12,7 +12,6 @@ namespace Grapevine.Local
         {
             using (var server = new RestServer())
             {
-                server.LogToConsole();
                 server.PublicFolder.Prefix = "Grapevine";
                 server.PublicFolder.FolderPath = @"C:\source\github\gv-gh-pages";
 

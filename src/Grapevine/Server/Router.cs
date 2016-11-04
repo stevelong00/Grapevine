@@ -5,8 +5,8 @@ using System.Reflection;
 using Grapevine.Exceptions.Server;
 using Grapevine.Interfaces.Server;
 using Grapevine.Interfaces.Shared;
+using Grapevine.Logging;
 using Grapevine.Shared;
-using Grapevine.Shared.Loggers;
 
 namespace Grapevine.Server
 {
@@ -147,7 +147,7 @@ namespace Grapevine.Server
         /// <summary>
         /// Gets or sets the internal logger
         /// </summary>
-        IGrapevineLogger Logger { get; set; }
+        GrapevineLogger Logger { get; }
 
         /// <summary>
         /// Adds the route to the routing table
@@ -272,7 +272,6 @@ namespace Grapevine.Server
     public class Router : IRouter
     {
         private readonly IList<IRoute> _routingTable;
-        private IGrapevineLogger _logger;
 
         public Func<IHttpContext, IHttpContext> After { get; set; }
         public Func<IHttpContext, IHttpContext> Before { get; set; }
@@ -288,7 +287,7 @@ namespace Grapevine.Server
         public Router()
         {
             _routingTable = new List<IRoute>();
-            Logger = NullLogger.GetInstance();
+            Logger = GrapevineLogManager.CreateLogger<Router>();
             Scanner = new RouteScanner();
             Scope = string.Empty;
         }
@@ -315,15 +314,7 @@ namespace Grapevine.Server
             return router;
         }
 
-        public IGrapevineLogger Logger
-        {
-            get { return _logger; }
-            set
-            {
-                _logger = value ?? NullLogger.GetInstance();
-                if (Scanner != null) Scanner.Logger = _logger;
-            }
-        }
+        public GrapevineLogger Logger { get; }
 
         public IRouter Register(IRoute route)
         {
@@ -531,7 +522,7 @@ namespace Grapevine.Server
             var totalRoutes = routing.Count;
             var routeCounter = 0;
 
-            Logger.BeginRouting($"{context.Request.Id} - {context.Request.Name} has {totalRoutes} routes");
+            Logger.BeginRouting($"{context.Request.Name} has {totalRoutes} routes", context.Request.Id);
 
             if (Before != null) routeContext = Before.Invoke(routeContext);
 
@@ -542,7 +533,7 @@ namespace Grapevine.Server
                     routeCounter++;
                     routeContext = route.Invoke(routeContext);
 
-                    Logger.RouteInvoked($"{context.Request.Id} - {routeCounter}/{totalRoutes} {route.Name}");
+                    Logger.RouteInvoked($"{routeCounter}/{totalRoutes} {route.Name}", context.Request.Id);
                     if (ContinueRoutingAfterResponseSent) continue;
                     if (routeContext.WasRespondedTo) break;
                 }
@@ -550,7 +541,7 @@ namespace Grapevine.Server
             finally
             {
                 if (After != null) routeContext = After.Invoke(routeContext);
-                Logger.EndRouting($"{context.Request.Id} - {routeCounter} of {totalRoutes} routes invoked");
+                Logger.EndRouting($"{routeCounter} of {totalRoutes} routes invoked", context.Request.Id);
             }
 
             return routeContext.WasRespondedTo;

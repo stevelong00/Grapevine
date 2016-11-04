@@ -6,11 +6,12 @@ using System.Threading;
 using Grapevine.Exceptions.Server;
 using Grapevine.Interfaces.Server;
 using Grapevine.Interfaces.Shared;
+using Grapevine.Logging;
 using Grapevine.Shared;
-using Grapevine.Shared.Loggers;
 using HttpStatusCode = Grapevine.Shared.HttpStatusCode;
 using ExtendedProtectionSelector = System.Net.HttpListener.ExtendedProtectionSelector;
 using HttpListener = Grapevine.Interfaces.Server.HttpListener;
+using LogEvent = Grapevine.Interfaces.Shared.LogEvent;
 
 namespace Grapevine.Server
 {
@@ -30,6 +31,11 @@ namespace Grapevine.Server
         string ListenerPrefix { get; }
 
         /// <summary>
+        /// Gets or sets the internal logger
+        /// </summary>
+        GrapevineLogger Logger { get; }
+
+        /// <summary>
         /// Starts the server: executes OnBeforeStart, starts the HttpListener, then executes OnAfterStart if the HttpListener is listening
         /// </summary>
         void Start();
@@ -46,7 +52,6 @@ namespace Grapevine.Server
         private string _port;
         private string _protocol = "http";
         private int _connections;
-        private IGrapevineLogger _logger;
         protected bool IsStopping;
         protected bool IsStarting;
         protected readonly IHttpListener Listener;
@@ -70,6 +75,7 @@ namespace Grapevine.Server
         {
             TestingMode = true;
             Listener = listener;
+            Logger = InMemoryLogger.GetLogger("");
         }
 
         public RestServer(IServerSettings options)
@@ -82,7 +88,6 @@ namespace Grapevine.Server
 
             Connections = options.Connections;
             Host = options.Host;
-            Logger = options.Logger;
             OnBeforeStart = options.OnBeforeStart;
             OnAfterStart = options.OnAfterStart;
             OnBeforeStop = options.OnBeforeStop;
@@ -92,6 +97,7 @@ namespace Grapevine.Server
             Router = options.Router;
             UseHttps = options.UseHttps;
 
+            Logger = GrapevineLogManager.CreateLogger<RestServer>();
             Advanced = new AdvancedRestServer(Listener);
             Listener.IgnoreWriteExceptions = true;
         }
@@ -135,15 +141,7 @@ namespace Grapevine.Server
 
         public bool IsListening => Listener?.IsListening ?? false;
 
-        public IGrapevineLogger Logger
-        {
-            get { return _logger; }
-            set
-            {
-                _logger = value ?? NullLogger.GetInstance();
-                if (Router != null) Router.Logger = _logger;
-            }
-        }
+        public GrapevineLogger Logger { get; private set; }
 
         public Action OnStart
         {
@@ -255,12 +253,6 @@ namespace Grapevine.Server
             Listener?.Close();
         }
 
-        public IRestServer LogToConsole()
-        {
-            Logger = new ConsoleLogger();
-            return this;
-        }
-
         /// <summary>
         /// For use in routes that want to stop the server; starts a new thread and then calls Stop on the server
         /// </summary>
@@ -293,7 +285,7 @@ namespace Grapevine.Server
             {
                 /* Ignore exceptions thrown by incomplete async methods listening for incoming requests */
                 if (IsStopping && e is HttpListenerException && ((HttpListenerException)e).NativeErrorCode == 995) return;
-                Logger.Debug(e);
+                Logger.Debug("When async request completes", e);
             }
         }
 
@@ -330,21 +322,21 @@ namespace Grapevine.Server
             }
             catch (RouteNotFoundException rnf)
             {
-                server.Logger.Log(new LogEvent {Exception = rnf, Level = LogLevel.Error, Message = rnf.Message});
-                if (server.EnableThrowingExceptions) throw;
+                server.Logger.Log(GrapevineLogLevel.Error, context.Request.Id, rnf.Message, rnf);
                 context.Response.SendResponse(HttpStatusCode.NotFound);
+                if (server.EnableThrowingExceptions) throw;
             }
             catch (NotImplementedException ni)
             {
-                server.Logger.Log(new LogEvent { Exception = ni, Level = LogLevel.Error, Message = ni.Message });
-                if (server.EnableThrowingExceptions) throw;
+                server.Logger.Log(GrapevineLogLevel.Error, context.Request.Id, ni.Message, ni);
                 context.Response.SendResponse(HttpStatusCode.NotImplemented);
+                if (server.EnableThrowingExceptions) throw;
             }
             catch (Exception e)
             {
-                server.Logger.Log(new LogEvent { Exception = e, Level = LogLevel.Error, Message = e.Message });
-                if (server.EnableThrowingExceptions) throw;
+                server.Logger.Log(GrapevineLogLevel.Error, context.Request.Id, e.Message, e);
                 context.Response.SendResponse(HttpStatusCode.InternalServerError, e);
+                if (server.EnableThrowingExceptions) throw;
             }
         }
 

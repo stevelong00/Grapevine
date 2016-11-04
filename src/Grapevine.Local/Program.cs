@@ -1,5 +1,6 @@
 ﻿using System;
 using Grapevine.Interfaces.Server;
+using Grapevine.Logging;
 using Grapevine.Server;
 using Grapevine.Server.Attributes;
 using Grapevine.Shared;
@@ -10,6 +11,8 @@ namespace Grapevine.Local
     {
         public static void Main(string[] args)
         {
+            GrapevineLogManager.Provider = new NLogLoggingProvider();
+
             using (var server = new RestServer())
             {
                 server.PublicFolder.Prefix = "Grapevine";

@@ -23,8 +23,13 @@ namespace Grapevine.Logging
 
         public static InMemoryLogger GetLogger(string name)
         {
-            if (!CreatedLoggers.ContainsKey(name)) CreatedLoggers[name] = new InMemoryLogger();
-            return CreatedLoggers[name];
+            return CreatedLoggers.GetOrAdd(name, s => new InMemoryLogger());
+        }
+
+        public static void RemoveLogger(string name)
+        {
+            InMemoryLogger logger;
+            CreatedLoggers.TryRemove(name, out logger);
         }
 
         public List<LogEvent> Logs { get; }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Grapevine.Interfaces.Shared;
-using Grapevine.Shared.Loggers;
 
 namespace Grapevine.Server
 {
@@ -45,11 +43,6 @@ namespace Grapevine.Server
         /// Use "*" to indicate that the HttpListener accepts requests sent to the port if the requested URI does not match any other prefix. Similarly, to specify that the HttpListener accepts all requests sent to a port, replace the host element with the "+" character.
         /// </summary>
         string Host { get; set; }
-
-        /// <summary>
-        /// Gets or sets the internal logger
-        /// </summary>
-        IGrapevineLogger Logger { get; set; }
 
         /// <summary>
         /// Gets or sets the Action that will be executed immediately following server start; synonym for OnAfterStart
@@ -156,7 +149,6 @@ namespace Grapevine.Server
         public string Port { get; set; }
         public bool UseHttps { get; set; }
 
-        public IGrapevineLogger Logger { get; set; }
         public IList<IPublicFolder> PublicFolders { get; }
 
         public IRouter Router { get; set; }
@@ -166,7 +158,6 @@ namespace Grapevine.Server
             PublicFolders = new List<IPublicFolder>();
             Connections = 50;
             Host = "localhost";
-            Logger = NullLogger.GetInstance();
             Port = "1234";
             Router = new Router();
             UseHttps = false;

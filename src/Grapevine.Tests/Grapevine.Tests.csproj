@@ -82,6 +82,8 @@
     <Compile Include="Client\QueryStringFacts.cs" />
     <Compile Include="Client\RestClientFacts.cs" />
     <Compile Include="Client\RestRequestFacts.cs" />
+    <Compile Include="Logging\InMemoryLoggingProviderFacts.cs" />
+    <Compile Include="Logging\NoOpLoggingProviderFacts.cs" />
     <Compile Include="Mocks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\AdvancedRestServerFacts.cs" />
@@ -103,10 +105,6 @@
     <Compile Include="Shared\HttpStatusCodeFacts.cs" />
     <Compile Include="Shared\InternalExtensionsFacts.cs" />
     <Compile Include="Shared\NameValueCollectionExtensionsFacts.cs" />
-    <Compile Include="Shared\Loggers\ConsoleLoggerFacts.cs" />
-    <Compile Include="Shared\Loggers\InMemoryLoggerFacts.cs" />
-    <Compile Include="Shared\Loggers\LoggerExtensionsFacts.cs" />
-    <Compile Include="Shared\Loggers\NullLoggerFacts.cs" />
     <Compile Include="Shared\PatternParserFacts.cs" />
     <Compile Include="Shared\PortFinderFacts.cs" />
     <Compile Include="Shared\StreamExtensionFacts.cs" />

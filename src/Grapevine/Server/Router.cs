@@ -5,10 +5,9 @@ using System.Linq;
 using System.Reflection;
 using Grapevine.Exceptions.Server;
 using Grapevine.Interfaces.Server;
-using Grapevine.Interfaces.Shared;
+using Grapevine.Logging;
 using Grapevine.Server.Attributes;
 using Grapevine.Shared;
-using Grapevine.Shared.Loggers;
 
 namespace Grapevine.Server
 {
@@ -173,9 +172,9 @@ namespace Grapevine.Server
         IRouter InsertFirst(IList<IRoute> routes);
 
         /// <summary>
-        /// Gets or sets the internal logger
+        /// Gets the internal logger
         /// </summary>
-        IGrapevineLogger Logger { get; set; }
+        GrapevineLogger Logger { get; }
 
         /// <summary>
         /// Adds the route to the routing table
@@ -301,7 +300,6 @@ namespace Grapevine.Server
 
         public Func<IHttpContext, IHttpContext> After { get; set; }
         public Func<IHttpContext, IHttpContext> Before { get; set; }
-        private IGrapevineLogger _logger;
 
         #endregion
 
@@ -321,9 +319,9 @@ namespace Grapevine.Server
         /// </summary>
         public Router()
         {
+            Logger = GrapevineLogManager.CreateLogger<Router>();
             RegisteredRoutes = new List<IRoute>();
             RouteCache = new ConcurrentDictionary<string, IList<IRoute>>();
-            Logger = NullLogger.GetInstance();
             Scanner = new RouteScanner();
             Scope = string.Empty;
         }
@@ -436,15 +434,7 @@ namespace Grapevine.Server
             return this;
         }
 
-        public IGrapevineLogger Logger
-        {
-            get { return _logger; }
-            set
-            {
-                _logger = value ?? NullLogger.GetInstance();
-                if (Scanner != null) Scanner.Logger = _logger;
-            }
-        }
+        public GrapevineLogger Logger { get; protected internal set; }
 
         public IRouter Register(IRoute route)
         {
@@ -543,7 +533,8 @@ namespace Grapevine.Server
             }
             catch (Exception e)
             {
-                Logger.Log(new LogEvent { Exception = e, Level = LogLevel.Error, Message = e.Message });
+                // TODO: Add Logging Here
+
                 if (context.Server.EnableThrowingExceptions) throw;
 
                 if (context.WasRespondedTo) return;
@@ -570,7 +561,7 @@ namespace Grapevine.Server
             var totalRoutes = routing.Count;
             var routeCounter = 0;
 
-            Logger.BeginRouting($"{context.Request.Id} - {context.Request.Name} has {totalRoutes} routes");
+            Logger.RoutingRequest(context.Request, totalRoutes);
 
             try
             {
@@ -581,7 +572,7 @@ namespace Grapevine.Server
                     routeCounter++;
                     route.Invoke(context);
 
-                    Logger.RouteInvoked($"{context.Request.Id} - {routeCounter}/{totalRoutes} {route.Name}");
+                    Logger.RouteInvoked(context.Request, route, totalRoutes, routeCounter);
 
                     if (ContinueRoutingAfterResponseSent) continue;
                     if (context.WasRespondedTo) break;
@@ -590,7 +581,7 @@ namespace Grapevine.Server
             finally
             {
                 OnAfterRouting(context);
-                Logger.EndRouting($"{context.Request.Id} - {routeCounter} of {totalRoutes} routes invoked");
+                Logger.RoutingComplete(context.Request, totalRoutes, routeCounter);
             }
 
             if (!context.WasRespondedTo) throw new RouteNotFoundException(context);

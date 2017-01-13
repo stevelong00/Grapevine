@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
 using Grapevine.Exceptions.Server;
 using Grapevine.Interfaces.Server;
-using Grapevine.Interfaces.Shared;
+using Grapevine.Logging;
 using Grapevine.Server;
 using Grapevine.Server.Attributes;
 using Grapevine.Shared;
-using Grapevine.Shared.Loggers;
 using Grapevine.TestAssembly;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
@@ -31,7 +29,7 @@ namespace Grapevine.Tests.Server
                 router.RoutingTable.ShouldBeEmpty();
 
                 router.Logger.ShouldNotBeNull();
-                router.Logger.ShouldBeOfType<NullLogger>();
+                router.Logger.ShouldBeAssignableTo<GrapevineLogger>();
 
                 router.Scanner.ShouldNotBeNull();
                 router.Scanner.ShouldBeOfType<RouteScanner>();
@@ -50,7 +48,7 @@ namespace Grapevine.Tests.Server
                 router.RoutingTable.ShouldBeEmpty();
 
                 router.Logger.ShouldNotBeNull();
-                router.Logger.ShouldBeOfType<NullLogger>();
+                router.Logger.ShouldBeAssignableTo<GrapevineLogger>();
 
                 router.Scanner.ShouldNotBeNull();
                 router.Scanner.ShouldBeOfType<RouteScanner>();
@@ -602,38 +600,6 @@ namespace Grapevine.Tests.Server
                 router.InsertFirst(routes);
 
                 router.RoutingTable.SequenceEqual(expected).ShouldBeTrue();
-            }
-        }
-
-        public class LoggerProperty
-        {
-            [Fact]
-            public void SetToNullSetsNullLogger()
-            {
-                var router = new Router { Logger = new InMemoryLogger() };
-                router.Logger.ShouldBeOfType<InMemoryLogger>();
-
-                router.Logger = null;
-
-                router.Logger.ShouldBeOfType<NullLogger>();
-            }
-
-            [Fact]
-            public void PropogatesToScanner()
-            {
-                var scanner = new RouteScanner();
-                scanner.Logger.ShouldBeOfType<NullLogger>();
-
-                var router = new Router { Scanner = scanner };
-                router.Logger.ShouldBeOfType<NullLogger>();
-
-                router.Logger = new InMemoryLogger();
-
-                router.Logger.ShouldBeOfType<InMemoryLogger>();
-                scanner.Logger.ShouldBeOfType<InMemoryLogger>();
-
-                router.Scanner = null;
-                Should.NotThrow(() => router.Logger = NullLogger.GetInstance());
             }
         }
 
@@ -1244,7 +1210,7 @@ namespace Grapevine.Tests.Server
             throw new NotImplementedException();
         }
 
-        public IGrapevineLogger Logger { get; set; }
+        public GrapevineLogger Logger { get; set; }
         public IRouter Register(IRoute route)
         {
             throw new NotImplementedException();

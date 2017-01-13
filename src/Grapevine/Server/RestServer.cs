@@ -6,9 +6,9 @@ using System.Security.Authentication.ExtendedProtection;
 using System.Threading;
 using Grapevine.Exceptions.Server;
 using Grapevine.Interfaces.Server;
-using Grapevine.Interfaces.Shared;
+using Grapevine.Logging;
 using Grapevine.Shared;
-using Grapevine.Shared.Loggers;
+//using HttpStatusCode = Grapevine.Shared.HttpStatusCode;
 using ExtendedProtectionSelector = System.Net.HttpListener.ExtendedProtectionSelector;
 using HttpListener = Grapevine.Interfaces.Server.HttpListener;
 
@@ -36,6 +36,11 @@ namespace Grapevine.Server
         string ListenerPrefix { get; }
 
         /// <summary>
+        /// Gets the internal logger
+        /// </summary>
+        GrapevineLogger Logger { get; }
+
+        /// <summary>
         /// Starts the server: executes OnBeforeStart, starts the HttpListener, then executes OnAfterStart if the HttpListener is listening
         /// </summary>
         void Start();
@@ -50,7 +55,6 @@ namespace Grapevine.Server
     {
         private readonly UriBuilder _uriBuilder = new UriBuilder("http", "localhost", 1234, "/");
 
-        private IGrapevineLogger _logger;
         protected bool IsStopping;
         protected bool IsStarting;
         protected readonly IHttpListener Listener;
@@ -78,17 +82,19 @@ namespace Grapevine.Server
         {
             TestingMode = true;
             Listener = listener;
+            Logger = InMemoryLogger.GetLogger("");
         }
 
         public RestServer(IServerSettings options)
         {
+            Logger = GrapevineLogManager.CreateLogger<RestServer>();
+
             Listener = new HttpListener(new System.Net.HttpListener());
             Listening = new Thread(HandleRequests);
             StopEvent = new ManualResetEvent(false);
 
             options.CloneEventHandlers(this);
             Host = options.Host;
-            Logger = options.Logger;
             Port = options.Port;
             PublicFolders = options.PublicFolders;
             Router = options.Router;
@@ -136,15 +142,7 @@ namespace Grapevine.Server
 
         public bool IsListening => Listener?.IsListening ?? false;
 
-        public IGrapevineLogger Logger
-        {
-            get { return _logger; }
-            set
-            {
-                _logger = value ?? NullLogger.GetInstance();
-                if (Router != null) Router.Logger = _logger;
-            }
-        }
+        public GrapevineLogger Logger { get; protected internal set; }
 
         public Action OnStart
         {
@@ -296,12 +294,6 @@ namespace Grapevine.Server
             }
         }
 
-        public IRestServer LogToConsole()
-        {
-            Logger = new ConsoleLogger();
-            return this;
-        }
-
         private List<Exception> InvokeServerEventHandlers(IEnumerable<ServerEventHandler> actions)
         {
             var exceptions = new List<Exception>();
@@ -389,7 +381,7 @@ namespace Grapevine.Server
             }
             catch (Exception e)
             {
-                Logger.Debug(e);
+                Logger.Debug(e.Message, e);
             }
         }
     }

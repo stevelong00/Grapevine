@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using Grapevine.Exceptions.Server;
 using Grapevine.Interfaces.Server;
-using Grapevine.Interfaces.Shared;
+using Grapevine.Logging;
 using Grapevine.Server;
-using Grapevine.Shared;
-using Grapevine.Shared.Loggers;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -29,7 +26,7 @@ namespace Grapevine.Tests.Server
                     server.Host.ShouldBe("localhost");
                     server.IsListening.ShouldBeFalse();
                     server.ListenerPrefix.ShouldBe("http://localhost:1234/");
-                    server.Logger.ShouldBeOfType<NullLogger>();
+                    server.Logger.ShouldBeAssignableTo<GrapevineLogger>();
                     server.OnAfterStart.ShouldBeNull();
                     server.OnAfterStop.ShouldBeNull();
                     server.OnBeforeStart.ShouldBeNull();
@@ -116,53 +113,6 @@ namespace Grapevine.Tests.Server
                 using (var server = new RestServer(listener))
                 {
                     server.IsListening.ShouldBeFalse();
-                }
-            }
-        }
-
-        public class LoggerProperty
-        {
-            [Fact]
-            public void NullSetNullLogger()
-            {
-                using (var server = new RestServer())
-                {
-                    server.LogToConsole();
-                    server.Logger.ShouldBeOfType<ConsoleLogger>();
-
-                    server.Logger = null;
-
-                    server.Logger.ShouldBeOfType<NullLogger>();
-                }
-            }
-
-            [Fact]
-            public void SetsRouterLogger()
-            {
-                using (var server = new RestServer())
-                {
-                    server.Router.ShouldNotBeNull();
-                    server.Logger.ShouldBeOfType<NullLogger>();
-                    server.Router.Logger.ShouldBeOfType<NullLogger>();
-
-                    server.LogToConsole();
-
-                    server.Logger.ShouldBeOfType<ConsoleLogger>();
-                    server.Router.Logger.ShouldBeOfType<ConsoleLogger>();
-                }
-            }
-
-            [Fact]
-            public void DoesNotSetRouterLoggerWhenRouterIsNull()
-            {
-                using (var server = new RestServer())
-                {
-                    server.Logger.ShouldBeOfType<NullLogger>();
-                    server.Router = null;
-
-                    Should.NotThrow(() => server.LogToConsole());
-
-                    server.Logger.ShouldBeOfType<ConsoleLogger>();
                 }
             }
         }

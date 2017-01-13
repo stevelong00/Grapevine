@@ -1,5 +1,6 @@
 ﻿using System;
 using Grapevine.Interfaces.Server;
+using Grapevine.Logging;
 using Grapevine.Server;
 using Grapevine.Server.Attributes;
 using Grapevine.Shared;
@@ -12,8 +13,8 @@ namespace Grapevine.Local
         {
             using (var server = new RestServer())
             {
-                server.LogToConsole();
-                server.PublicFolder = new PublicFolder(@"C:\source\github\gv-gh-pages") {Prefix = "Grapevine"};
+                GrapevineLogManager.Provider = new ConsoleLoggingProvider();
+
 
                 server.OnBeforeStart = () => Console.WriteLine("---------------> Starting Server");
                 server.OnAfterStart = () => Console.WriteLine($"<--------------- Server Started");

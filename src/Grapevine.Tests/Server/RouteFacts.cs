@@ -334,7 +334,7 @@ namespace Grapevine.Tests.Server
 
             public class IsDisposeable : IDisposable
             {
-                public static bool WasDisposed = false;
+                public static bool WasDisposed;
 
                 public IHttpContext TestDisposing(IHttpContext context)
                 {

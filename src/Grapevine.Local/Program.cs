@@ -1,6 +1,6 @@
 ﻿using System;
 using Grapevine.Interfaces.Server;
-using Grapevine.Logging;
+using Grapevine.Providers.Logging;
 using Grapevine.Server;
 using Grapevine.Server.Attributes;
 using Grapevine.Shared;

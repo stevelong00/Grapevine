@@ -1,8 +1,8 @@
-﻿using Grapevine.Logging;
+﻿using Grapevine.Providers.Logging;
 using Shouldly;
 using Xunit;
 
-namespace Grapevine.Tests.Logging
+namespace Grapevine.Tests.Providers.Logging
 {
     public class InMemoryLoggingProviderFacts
     {

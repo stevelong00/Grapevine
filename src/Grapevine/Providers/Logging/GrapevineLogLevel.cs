@@ -1,4 +1,4 @@
-﻿namespace Grapevine.Logging
+﻿namespace Grapevine.Providers.Logging
 {
     public enum GrapevineLogLevel
     {

@@ -1,7 +1,7 @@
 ﻿using Grapevine.Interfaces.Server;
 using Grapevine.Server;
 
-namespace Grapevine.Logging
+namespace Grapevine.Providers.Logging
 {
     public static class LoggerExtensions
     {

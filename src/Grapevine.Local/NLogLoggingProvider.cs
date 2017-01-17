@@ -1,5 +1,5 @@
 ﻿using System;
-using Grapevine.Logging;
+using Grapevine.Providers.Logging;
 using NLog;
 
 namespace Grapevine.Local

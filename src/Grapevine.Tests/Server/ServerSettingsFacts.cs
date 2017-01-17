@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Grapevine.Logging;
 using Grapevine.Server;
 using Shouldly;
 using Xunit;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Grapevine.Exceptions.Server;
 using Grapevine.Interfaces.Server;
-using Grapevine.Logging;
+using Grapevine.Providers.Logging;
 using Grapevine.Server;
 using NSubstitute;
 using Shouldly;

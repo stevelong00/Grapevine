@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 
-namespace Grapevine.Logging
+namespace Grapevine.Providers.Logging
 {
     /// <summary>
     /// Manages logging for Grapevine, used to set the loggging provider.
@@ -60,7 +59,7 @@ namespace Grapevine.Logging
 
         private static string GetClassFullName()
         {
-            string className = null;
+            string className;
             var framesToSkip = 2;
 
             Type declaringType;

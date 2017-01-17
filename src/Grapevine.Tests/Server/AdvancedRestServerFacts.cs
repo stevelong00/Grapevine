@@ -18,7 +18,6 @@ namespace Grapevine.Tests.Server
             var val = advanced.AuthenticationSchemeSelectorDelegate;
             advanced.AuthenticationSchemeSelectorDelegate = val;
 
-            var temp = listener.Received().AuthenticationSchemeSelectorDelegate;
             listener.Received().AuthenticationSchemeSelectorDelegate = val;
         }
 
@@ -31,7 +30,6 @@ namespace Grapevine.Tests.Server
             var val = advanced.AuthenticationSchemes;
             advanced.AuthenticationSchemes = val;
 
-            var temp = listener.Received().AuthenticationSchemes;
             listener.Received().AuthenticationSchemes = val;
         }
 
@@ -44,7 +42,6 @@ namespace Grapevine.Tests.Server
             var val = advanced.ExtendedProtectionPolicy;
             advanced.ExtendedProtectionPolicy = val;
 
-            var temp = listener.Received().ExtendedProtectionPolicy;
             listener.Received().ExtendedProtectionPolicy = val;
         }
 
@@ -57,7 +54,6 @@ namespace Grapevine.Tests.Server
             var val = advanced.ExtendedProtectionSelectorDelegate;
             advanced.ExtendedProtectionSelectorDelegate = val;
 
-            var temp = listener.Received().ExtendedProtectionSelectorDelegate;
             listener.Received().ExtendedProtectionSelectorDelegate = val;
         }
 
@@ -70,7 +66,6 @@ namespace Grapevine.Tests.Server
             var val = advanced.IgnoreWriteExceptions;
             advanced.IgnoreWriteExceptions = val;
 
-            var temp = listener.Received().IgnoreWriteExceptions;
             listener.Received().IgnoreWriteExceptions = val;
         }
 
@@ -83,7 +78,6 @@ namespace Grapevine.Tests.Server
             var val = advanced.Realm;
             advanced.Realm = val;
 
-            var temp = listener.Received().Realm;
             listener.Received().Realm = val;
         }
 
@@ -106,7 +100,6 @@ namespace Grapevine.Tests.Server
             var val = advanced.UnsafeConnectionNtlmAuthentication;
             advanced.UnsafeConnectionNtlmAuthentication = val;
 
-            var temp = listener.Received().UnsafeConnectionNtlmAuthentication;
             listener.Received().UnsafeConnectionNtlmAuthentication = val;
         }
 

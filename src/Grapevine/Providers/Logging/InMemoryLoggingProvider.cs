@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Grapevine.Logging
+namespace Grapevine.Providers.Logging
 {
     public class InMemoryLoggingProvider : IGrapevineLoggingProvider
     {

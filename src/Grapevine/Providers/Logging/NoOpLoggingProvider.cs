@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Grapevine.Logging
+namespace Grapevine.Providers.Logging
 {
     public class NoOpLoggingProvider : IGrapevineLoggingProvider
     {

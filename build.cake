@@ -2,6 +2,7 @@
 //#load "./cake-scripts/xunit.csx"
 #load "./cake-scripts/clean.csx"
 #load "./cake-scripts/nuget.csx"
+
 //#load "./cake-scripts/coverage.csx"
 
 var target = Argument("target", "Default");
@@ -12,7 +13,7 @@ var projectPath = "./src/" + projectName;
 var solutionPath = projectPath + ".sln";
 
 Task("default")
-    //.IsDependentOn("clean")
+    .IsDependentOn("clean")
     .IsDependentOn("nuget-restore")
     .Does(() =>
     {
@@ -21,7 +22,7 @@ Task("default")
         Console.WriteLine("Solution Path : " + solutionPath);
     });
 
-//    .IsDependentOn("compile-debug");
+//.IsDependentOn("compile-debug");
 
 //Task("cover")
 //    .IsDependentOn("compile-debug")

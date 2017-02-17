@@ -46,6 +46,8 @@
     <Compile Include="Client\QueryString.cs" />
     <Compile Include="Exceptions\Client\ClientStateException.cs" />
     <Compile Include="Exceptions\Server\NotFoundException.cs" />
+    <Compile Include="Interfaces\IHttpRequest.cs" />
+    <Compile Include="Interfaces\IHttpResponse.cs" />
     <Compile Include="Interfaces\Server\IHttpListenerContext.cs" />
     <Compile Include="Interfaces\Shared\IGrapevineLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

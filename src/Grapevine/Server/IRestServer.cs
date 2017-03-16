@@ -1,4 +1,4 @@
-﻿namespace Grapevine.Interfaces
+﻿namespace Grapevine.Server
 {
     public interface IRestServer
     {

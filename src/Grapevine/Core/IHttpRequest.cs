@@ -1,7 +1,6 @@
 ﻿using System.Collections.Specialized;
-using System.Net;
 
-namespace Grapevine.Interfaces
+namespace Grapevine.Core
 {
     public interface IHttpRequest<out TRequest>
     {
@@ -28,16 +27,17 @@ namespace Grapevine.Interfaces
     {
     }
 
-    public class InboundHttpRequest : IInboundHttpRequest<HttpListenerRequest>
+    public class InboundHttpRequest : IInboundHttpRequest<System.Net.HttpListenerRequest>
     {
-        public HttpListenerRequest Advanced { get; }
+        public System.Net.HttpListenerRequest Advanced { get; }
 
-        public InboundHttpRequest(HttpListenerRequest request)
+        public InboundHttpRequest(System.Net.HttpListenerRequest request)
         {
             Advanced = request;
+
         }
 
-        public NameValueCollection Headers { get; }
+        public NameValueCollection Headers => Advanced.Headers;
 
         public string PathInfo { get; }
     }

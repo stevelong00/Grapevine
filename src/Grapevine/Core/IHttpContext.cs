@@ -1,9 +1,11 @@
 ﻿using System.Net;
+using Grapevine.Interfaces;
+using Grapevine.Server;
 
-namespace Grapevine.Interfaces
+namespace Grapevine.Core
 {
     /// <summary>
-    /// Provides access to the server, request and response objects in context
+    /// Provides access to the request and response objects in context
     /// </summary>
     /// <typeparam name="TContext"></typeparam>
     /// <typeparam name="TRequest"></typeparam>
@@ -21,18 +23,25 @@ namespace Grapevine.Interfaces
         IHttpResponse<TResponse> Response { get; }
 
         /// <summary>
-        /// Gets the IRestServer object the client request was sent to
-        /// </summary>
-        IRestServer Server { get; }
-
-        /// <summary>
         /// Returns the underlying context implementation
         /// </summary>
         TContext Advanced { get; }
     }
 
-    public interface IOutboundHttpContext { }
+    /// <summary>
+    /// Convinience interface for adding extension methods to outbound http context (client)
+    /// </summary>
+    public interface IOutboundHttpContext
+    {
+        
+    }
 
+    /// <summary>
+    /// Represents an outbound http request context
+    /// </summary>
+    /// <typeparam name="TContext"></typeparam>
+    /// <typeparam name="TRequest"></typeparam>
+    /// <typeparam name="TResponse"></typeparam>
     public interface IOutboundHttpContext<out TContext, out TRequest, out TResponse> : IOutboundHttpContext, IHttpContext<TContext, TRequest, TResponse>
     {
         new IOutboundHttpRequest<TRequest> Request { get; }
@@ -40,8 +49,16 @@ namespace Grapevine.Interfaces
         new IInboundHttpResponse<TResponse> Response { get; }
     }
 
+    /// <summary>
+    /// Convinience interface for adding extension methods to inbound http context (server)
+    /// </summary>
     public interface IInboundHttpContext
     {
+        /// <summary>
+        /// Gets the IRestServer object the client request was sent to
+        /// </summary>
+        IRestServer Server { get; }
+
         bool WasRespondedTo { get; }
     }
 
@@ -69,18 +86,18 @@ namespace Grapevine.Interfaces
 
         public IOutboundHttpResponse<HttpListenerResponse> Response => new OutboundHttpResponse(Advanced.Response);
 
+        IHttpRequest<HttpListenerRequest> IHttpContext<HttpListenerContext, HttpListenerRequest, HttpListenerResponse>.Request => Request;
+
+        IHttpResponse<HttpListenerResponse> IHttpContext<HttpListenerContext, HttpListenerRequest, HttpListenerResponse>.Response => Response;
+
         public IRestServer Server { get; }
 
-        public bool WasRespondedTo { get; protected internal set; }
+        public bool WasRespondedTo => Response.ResponseSent;
 
         public HttpContext(HttpListenerContext context, IRestServer server)
         {
             Advanced = context;
             Server = server;
         }
-
-        IHttpRequest<HttpListenerRequest> IHttpContext<HttpListenerContext, HttpListenerRequest, HttpListenerResponse>.Request => Request;
-
-        IHttpResponse<HttpListenerResponse> IHttpContext<HttpListenerContext, HttpListenerRequest, HttpListenerResponse>.Response => Response;
     }
 }

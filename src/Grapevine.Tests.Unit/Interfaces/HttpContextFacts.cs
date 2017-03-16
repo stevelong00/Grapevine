@@ -1,4 +1,4 @@
-﻿using Grapevine.Interfaces;
+﻿using Grapevine.Core;
 using NSubstitute;
 using Shouldly;
 using Xunit;

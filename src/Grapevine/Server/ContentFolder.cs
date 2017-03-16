@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Grapevine.Interfaces;
+using Grapevine.Core;
 using Grapevine.Common;
 using FileNotFoundException = Grapevine.Exceptions.FileNotFoundException;
 

@@ -1,9 +1,7 @@
-#load "helpers/Constants.cs"
-
 using System;
 
 var slnPath = "./src/Grapevine.sln";
-var toolVersion = MSBuildToolVersion.NET40;
+var toolVersion = MSBuildToolVersion.NET46;
 var buildVersion = "version_num";
 
 Task("compile-debug")

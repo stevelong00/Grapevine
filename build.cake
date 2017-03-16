@@ -6,7 +6,7 @@
 var target = Argument("target", "default");
 
 Task("default")
-    .IsDependentOn("cover")
+    .IsDependentOn("cover");
 
 Task("cover")
     .IsDependentOn("compile-debug")

@@ -5,11 +5,12 @@
 using System.Collections.Generic;
 
 private XUnit2Settings xuSettings = new XUnit2Settings {ShadowCopy = false};
-private OpenCoverSettings ocSettings = new OpenCoverSettings().WithFilter("+[Grapevine]*");
+private OpenCoverSettings ocSettings = new OpenCoverSettings().WithFilter("+[*]* -[*.Tests*]* -[*]*.*Config -[xunit*]* -[*]Grapevine.Core.*");
 
 Task("unit-test-coverage")
 .Does(() =>
 {
+    System.Console.WriteLine(ReportPaths.Unit.OutputFile);
     OpenCover(tool => { tool.XUnit2("./**/Grapevine.Tests.Unit.dll", xuSettings); },
         new FilePath(ReportPaths.Unit.OutputFile),
         ocSettings);
@@ -73,6 +74,8 @@ internal static class ReportPaths
     static ReportPaths()
     {
         OutputDirectory = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), OutputFolder);
+        System.IO.Directory.CreateDirectory(OutputDirectory);
+
         Unit = new IoPaths("unit");
         Integration = new IoPaths("integration");
         Combined = new IoPaths("combined");
@@ -92,5 +95,7 @@ internal class IoPaths
         OutputFile = System.IO.Path.Combine(ReportPaths.OutputDirectory, type + "-test-coverage.xml");
         OutputFolder = System.IO.Path.Combine(ReportPaths.OutputDirectory, "reports", type);
         ReportIndex = System.IO.Path.Combine(OutputFolder, "index.htm");
+
+        System.IO.Directory.CreateDirectory(OutputFolder);
     }
 }

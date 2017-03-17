@@ -54,7 +54,6 @@
     <Compile Include="Core\IHttpListener.cs" />
     <Compile Include="Core\IHttpRequest.cs" />
     <Compile Include="Core\IHttpResponse.cs" />
-    <Compile Include="Server\IRestServer.cs" />
     <Compile Include="Logging\ConsoleLoggingProvider.cs" />
     <Compile Include="Logging\GrapevineLogger.cs" />
     <Compile Include="Logging\GrapevineLogLevel.cs" />

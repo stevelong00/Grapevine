@@ -48,6 +48,7 @@
     <Compile Include="Common\InternalExtensions.cs" />
     <Compile Include="Common\PatternParser.cs" />
     <Compile Include="Common\UriSchemes.cs" />
+    <Compile Include="Exceptions\InvalidRouteMethodException.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Core\IDynamicProperties.cs" />
     <Compile Include="Core\IHttpContext.cs" />

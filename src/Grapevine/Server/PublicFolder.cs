@@ -148,6 +148,15 @@ namespace Grapevine.Server
                     }
                 }
 
+                // sl00 BEGIN TEST FOR BINARY FILES
+                var fileInfo = new FileInfo(filepath);
+                var binaryExtensions = new string[] { ".zip", ".msi", ".exe" };
+                if (binaryExtensions.Contains(fileInfo.Extension))
+                {
+                    context.Response.ContentType = ContentType.CUSTOM_BINARY;
+                }
+                // sl00 END TEST FOR BINARY FILES
+
                 context.Response.SendResponse(new FileStream(filepath, FileMode.Open));
             }
 

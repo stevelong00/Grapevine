@@ -122,7 +122,35 @@ namespace Grapevine.Server
         /// </summary>
         public AdvancedRestServer Advanced { get; }
 
-        public int Connections { get; set; }
+        public int Connections
+        {
+            get
+            {
+                int maxWorkerThreads = 0;
+                int maxIoThreads = 0;
+                ThreadPool.GetMaxThreads(out maxWorkerThreads, out maxIoThreads);
+                return maxWorkerThreads;
+            }
+            set
+            {
+                int maxWorkerThreads = 0;
+                int maxIoThreads = 0;
+                ThreadPool.GetMaxThreads(out maxWorkerThreads, out maxIoThreads);
+
+                int minWorkerThreads = 0;
+                int minIoThreads = 0;
+                ThreadPool.GetMinThreads(out minWorkerThreads, out minIoThreads);
+
+                if (value <= minWorkerThreads)
+                {
+                    ThreadPool.SetMaxThreads(minWorkerThreads, maxIoThreads);
+                }
+                else
+                {
+                    ThreadPool.SetMaxThreads(value, maxIoThreads);
+                }
+            }
+        }
 
         public string Host
         {
@@ -367,6 +395,16 @@ namespace Grapevine.Server
             try
             {
                 var context = new HttpContext(Listener.EndGetContext(result), this);
+
+                int availableWorkerThreads = 0;
+                int availableIoThreads = 0;
+                ThreadPool.GetAvailableThreads(out availableWorkerThreads, out availableIoThreads);
+                if (availableIoThreads <= 0)
+                {
+                    // respond with a 503 code, server busy
+                    context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.ServiceUnavailable, "");
+                }
+                
                 ThreadPool.QueueUserWorkItem(Router.Route, context);
             }
             catch (ObjectDisposedException)

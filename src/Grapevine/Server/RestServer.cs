@@ -403,6 +403,7 @@ namespace Grapevine.Server
                 {
                     // respond with a 503 code, server busy
                     context.Response.SendResponse(Grapevine.Shared.HttpStatusCode.ServiceUnavailable, "");
+                    return;
                 }
                 
                 ThreadPool.QueueUserWorkItem(Router.Route, context);

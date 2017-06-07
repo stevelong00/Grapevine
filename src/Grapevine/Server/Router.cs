@@ -527,6 +527,7 @@ namespace Grapevine.Server
         {
             var context = state as IHttpContext;
             if (context == null) return;
+            if (context.WasRespondedTo) return;
 
             try
             {

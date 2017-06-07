@@ -548,19 +548,28 @@ namespace Grapevine.Server
 
                 if (context.WasRespondedTo) return;
 
-                if (e is NotFoundException)
+                try
                 {
-                    context.Response.SendResponse(HttpStatusCode.NotFound, e.Message);
+                    if (e is NotFoundException)
+                    {
+                        context.Response.SendResponse(HttpStatusCode.NotFound, e.Message);
+                        return;
+                    }
+
+                    if (e is NotImplementedException)
+                    {
+                        context.Response.SendResponse(HttpStatusCode.NotImplemented, e.Message);
+                        return;
+                    }
+
+                    context.Response.SendResponse(HttpStatusCode.InternalServerError, e);
+                }
+                catch(Exception ex)
+                {
+                    Logger.Log(new LogEvent { Exception = ex, Level = LogLevel.Error, Message = ex.Message });
+                    if (context.Server.EnableThrowingExceptions) throw;
                     return;
                 }
-
-                if (e is NotImplementedException)
-                {
-                    context.Response.SendResponse(HttpStatusCode.NotImplemented, e.Message);
-                    return;
-                }
-
-                context.Response.SendResponse(HttpStatusCode.InternalServerError, e);
             }
         }
 

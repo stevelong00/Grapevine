@@ -172,11 +172,18 @@ namespace Grapevine.Server
                 response.AddHeader("Expires",
                     DateTime.Now.AddHours(response.Advanced?.DefaultHoursToExpire ?? 23).ToString("R"));
 
-            var buffer = response.ContentType.IsText()
-                ? stream.GetTextBytes(response.ContentEncoding)
-                : stream.GetBinaryBytes();
-
+            byte[] buffer;
+            if(response.ContentType.IsText())
+            {
+                buffer = stream.GetTextBytes(response.ContentEncoding);
+            }
+            else
+            {
+                buffer = stream.GetBinaryBytes();
+                response.SendChunked = true;
+            }
             response.SendResponse(buffer);
+
         }
     }
 }

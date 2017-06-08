@@ -157,7 +157,8 @@ namespace Grapevine.Server
                 }
                 // sl00 END TEST FOR BINARY FILES
 
-                context.Response.SendResponse(new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read));
+                var stream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                context.Response.SendResponse(stream);
             }
 
             if (!string.IsNullOrEmpty(Prefix) && context.Request.PathInfo.StartsWith(Prefix) && !context.WasRespondedTo)
